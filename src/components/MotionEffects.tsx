@@ -4,19 +4,16 @@ import { useEffect } from "react";
 
 export default function MotionEffects() {
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    const revealTargets = Array.from(
-      document.querySelectorAll<HTMLElement>("[data-reveal]"),
-    );
+    const root = document.documentElement;
+    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const revealTargets = Array.from(document.querySelectorAll<HTMLElement>("[data-reveal]"));
     const progress = document.querySelector<HTMLElement>(".scroll-progress");
     const floatingNav = document.querySelector<HTMLElement>(".floating-nav");
     const hero = document.querySelector<HTMLElement>(".hero");
 
-    let revealObserver: IntersectionObserver | null = null;
+    root.classList.add("motion-ready");
 
+    let revealObserver: IntersectionObserver | null = null;
     if (prefersReducedMotion || !("IntersectionObserver" in window)) {
       revealTargets.forEach((target) => target.classList.add("is-visible"));
     } else {
@@ -28,62 +25,42 @@ export default function MotionEffects() {
             revealObserver?.unobserve(entry.target);
           });
         },
-        { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+        { threshold: 0.1, rootMargin: "0px 0px -10% 0px" },
       );
-
       revealTargets.forEach((target) => revealObserver?.observe(target));
     }
 
-    const navAnchors = Array.from(
-      document.querySelectorAll<HTMLAnchorElement>(".nav-links a[href^='#']"),
-    );
-    const sectionIds = navAnchors
+    const navAnchors = Array.from(document.querySelectorAll<HTMLAnchorElement>(".nav-links a[href^='#']"));
+    const sections = navAnchors
       .map((anchor) => anchor.getAttribute("href"))
-      .filter((href): href is string => Boolean(href && href.length > 1));
-    const sections = sectionIds
+      .filter((href): href is string => Boolean(href && href.length > 1))
       .map((href) => document.querySelector<HTMLElement>(href))
       .filter((section): section is HTMLElement => Boolean(section));
 
     let activeObserver: IntersectionObserver | null = null;
-
     if ("IntersectionObserver" in window && sections.length) {
       activeObserver = new IntersectionObserver(
         (entries) => {
           const visible = entries
             .filter((entry) => entry.isIntersecting)
             .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
           if (!visible) return;
           const activeHref = `#${visible.target.id}`;
-
-          navAnchors.forEach((anchor) => {
-            anchor.classList.toggle(
-              "is-active",
-              anchor.getAttribute("href") === activeHref,
-            );
-          });
+          navAnchors.forEach((anchor) => anchor.classList.toggle("is-active", anchor.getAttribute("href") === activeHref));
         },
-        { rootMargin: "-32% 0px -52% 0px", threshold: [0, 0.15, 0.35] },
+        { rootMargin: "-28% 0px -58% 0px", threshold: [0, 0.15, 0.35] },
       );
-
       sections.forEach((section) => activeObserver?.observe(section));
     }
 
     let scrollFrame = 0;
-
     const updateScroll = () => {
       if (scrollFrame) return;
-
       scrollFrame = window.requestAnimationFrame(() => {
-        const scrollable = Math.max(
-          document.documentElement.scrollHeight - window.innerHeight,
-          1,
-        );
+        const scrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1);
         const value = Math.min(window.scrollY / scrollable, 1);
-
         if (progress) progress.style.transform = `scaleX(${value})`;
-        floatingNav?.classList.toggle("is-scrolled", window.scrollY > 28);
-
+        floatingNav?.classList.toggle("is-scrolled", window.scrollY > 120);
         scrollFrame = 0;
       });
     };
@@ -93,22 +70,16 @@ export default function MotionEffects() {
 
     const supportsFinePointer = window.matchMedia("(pointer: fine)").matches;
     let pointerFrame = 0;
-
     const updateHeroPointer = (event: PointerEvent) => {
       if (!hero || pointerFrame) return;
-
       pointerFrame = window.requestAnimationFrame(() => {
         const bounds = hero.getBoundingClientRect();
         const x = (event.clientX - bounds.left) / bounds.width - 0.5;
         const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-
-        hero.style.setProperty("--hero-x", `${x * 18}px`);
-        hero.style.setProperty("--hero-y", `${y * 14}px`);
-        hero.style.setProperty("--hero-tilt-x", `${y * -2.1}deg`);
-        hero.style.setProperty("--hero-tilt-y", `${x * 2.7}deg`);
-        hero.style.setProperty("--pointer-x", `${(x + 0.5) * 100}%`);
-        hero.style.setProperty("--pointer-y", `${(y + 0.5) * 100}%`);
-
+        hero.style.setProperty("--hero-x", `${x * 12}px`);
+        hero.style.setProperty("--hero-y", `${y * 10}px`);
+        hero.style.setProperty("--hero-tilt-x", `${y * -1.4}deg`);
+        hero.style.setProperty("--hero-tilt-y", `${x * 1.8}deg`);
         pointerFrame = 0;
       });
     };
@@ -119,8 +90,6 @@ export default function MotionEffects() {
       hero.style.setProperty("--hero-y", "0px");
       hero.style.setProperty("--hero-tilt-x", "0deg");
       hero.style.setProperty("--hero-tilt-y", "0deg");
-      hero.style.setProperty("--pointer-x", "72%");
-      hero.style.setProperty("--pointer-y", "30%");
     };
 
     if (hero && supportsFinePointer && !prefersReducedMotion) {
@@ -134,9 +103,9 @@ export default function MotionEffects() {
       window.removeEventListener("scroll", updateScroll);
       hero?.removeEventListener("pointermove", updateHeroPointer);
       hero?.removeEventListener("pointerleave", resetHeroPointer);
-
       if (scrollFrame) window.cancelAnimationFrame(scrollFrame);
       if (pointerFrame) window.cancelAnimationFrame(pointerFrame);
+      root.classList.remove("motion-ready");
     };
   }, []);
 
