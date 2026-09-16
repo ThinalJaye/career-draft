@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import BottomDock from "@/components/BottomDock";
 import "./globals.css";
 import "./enhancements.css";
 import "./nav-polish.css";
+import "./bottom-dock.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +38,10 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} antialiased`}
     >
-      <body>{children}</body>
+      <body>
+        {children}
+        <BottomDock />
+      </body>
     </html>
   );
 }
