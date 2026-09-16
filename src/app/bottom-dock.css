@@ -1,0 +1,259 @@
+/* Persistent bottom dock inspired by a compact mobile-app navigation bar. */
+
+/* Retire the previous experimental nav without touching page structure. */
+.floating-nav { display: none !important; }
+
+.career-dock {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 120;
+  width: min(610px, calc(100% - 26px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.career-dock-shell {
+  position: relative;
+  min-height: 82px;
+  display: grid;
+  grid-template-columns: 1fr 132px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border: 1px solid rgba(255,255,255,.105);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(8,13,27,.96), rgba(5,10,22,.94));
+  box-shadow:
+    0 22px 70px rgba(0,0,0,.44),
+    0 0 0 1px rgba(72,104,170,.06),
+    inset 0 1px rgba(255,255,255,.055);
+  backdrop-filter: blur(24px) saturate(135%);
+  -webkit-backdrop-filter: blur(24px) saturate(135%);
+  pointer-events: auto;
+  transition: min-height .24s ease, transform .24s ease, box-shadow .24s ease, background .24s ease;
+}
+
+.career-dock-side {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 10px;
+}
+
+.career-dock-item {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 18px;
+  color: rgba(232,239,250,.78);
+  background: transparent;
+  transition: color .18s ease, background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease;
+}
+
+.career-dock-item svg,
+.career-dock-center svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.career-dock-item:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  background: rgba(255,255,255,.055);
+  border-color: rgba(255,255,255,.055);
+}
+
+.career-dock-item.is-active {
+  color: #7eeeff;
+  background: linear-gradient(180deg, rgba(66,103,186,.16), rgba(255,255,255,.04));
+  border-color: rgba(110,194,255,.17);
+  box-shadow: inset 0 1px rgba(255,255,255,.045), 0 8px 24px rgba(0,0,0,.14);
+}
+
+.career-dock-item.is-active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 16px;
+  height: 2px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg,#22d3ee,#818cf8);
+  box-shadow: 0 0 10px rgba(34,211,238,.5);
+}
+
+.career-dock-item::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translate(-50%, 5px);
+  padding: 7px 9px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 9px;
+  color: #eaf3ff;
+  background: rgba(5,10,22,.92);
+  box-shadow: 0 10px 30px rgba(0,0,0,.24);
+  font-size: .66rem;
+  font-weight: 700;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+}
+
+.career-dock-item:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.career-dock-center {
+  position: relative;
+  z-index: 4;
+  width: 118px;
+  height: 118px;
+  margin: -26px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 34px;
+  color: white;
+  background:
+    radial-gradient(circle at 50% 26%, rgba(96,165,250,.13), transparent 35%),
+    linear-gradient(180deg, #1a2034 0%, #11182b 100%);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,.42),
+    0 0 0 1px rgba(92,124,198,.08),
+    inset 0 1px rgba(255,255,255,.08);
+  transition: transform .2s ease, box-shadow .2s ease, width .24s ease, height .24s ease, border-radius .24s ease;
+}
+
+.career-dock-center:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 28px 68px rgba(0,0,0,.48),
+    0 0 30px rgba(79,70,229,.16),
+    inset 0 1px rgba(255,255,255,.09);
+}
+
+.career-dock-center strong {
+  position: relative;
+  z-index: 2;
+  font-size: .82rem;
+  letter-spacing: -.01em;
+}
+
+.career-dock-center svg {
+  position: relative;
+  z-index: 2;
+  width: 25px;
+  height: 25px;
+}
+
+.career-dock-accent {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#ff6b86,#f77965 45%,#ff9f62 100%);
+  box-shadow: 0 0 26px rgba(255,107,134,.25);
+}
+.career-dock-accent-top { top: 10px; }
+.career-dock-accent-bottom { bottom: 10px; }
+
+/* Scrolling only tightens the dock. Icons remain visible at all times. */
+.career-dock.is-compact .career-dock-shell {
+  min-height: 72px;
+  transform: scale(.96);
+  background: rgba(5,10,22,.96);
+  box-shadow: 0 18px 56px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.05);
+}
+
+.career-dock.is-compact .career-dock-center {
+  width: 104px;
+  height: 104px;
+  border-radius: 30px;
+}
+
+.career-dock.is-compact .career-dock-item {
+  width: 48px;
+  height: 48px;
+}
+
+@media (max-width: 680px) {
+  .career-dock {
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: calc(100% - 18px);
+  }
+
+  .career-dock-shell {
+    min-height: 70px;
+    grid-template-columns: 1fr 96px 1fr;
+    gap: 4px;
+    padding: 6px 10px;
+  }
+
+  .career-dock-side { gap: 2px; }
+  .career-dock-item { width: 44px; height: 44px; border-radius: 14px; }
+  .career-dock-item svg { width: 21px; height: 21px; }
+
+  .career-dock-center {
+    width: 92px;
+    height: 92px;
+    margin: -21px auto;
+    border-radius: 27px;
+    gap: 6px;
+  }
+
+  .career-dock-center strong { font-size: .73rem; }
+  .career-dock-center svg { width: 22px; height: 22px; }
+  .career-dock-accent { left: 12px; right: 12px; height: 14px; }
+  .career-dock-accent-top { top: 8px; }
+  .career-dock-accent-bottom { bottom: 8px; }
+
+  .career-dock.is-compact .career-dock-center {
+    width: 86px;
+    height: 86px;
+    border-radius: 25px;
+  }
+
+  .career-dock-item::before { display: none; }
+}
+
+@media (max-width: 420px) {
+  .career-dock-shell {
+    grid-template-columns: 1fr 86px 1fr;
+    padding-inline: 7px;
+  }
+
+  .career-dock-item { width: 40px; height: 40px; }
+  .career-dock-item svg { width: 20px; height: 20px; }
+  .career-dock-center { width: 84px; height: 84px; border-radius: 24px; }
+  .career-dock-center strong { font-size: .68rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .career-dock-shell,
+  .career-dock-item,
+  .career-dock-center {
+    transition: none !important;
+  }
+}
