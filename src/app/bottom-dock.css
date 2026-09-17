@@ -1,0 +1,303 @@
+/* Persistent bottom dock — compact, balanced, and app-like. */
+
+/* Retire the previous experimental text navbar. */
+.floating-nav { display: none !important; }
+
+.career-dock {
+  position: fixed;
+  left: 50%;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  z-index: 120;
+  width: min(540px, calc(100% - 30px));
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.career-dock-shell {
+  position: relative;
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: 1fr 104px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 16px;
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(8, 13, 27, .95), rgba(4, 8, 18, .94));
+  box-shadow:
+    0 20px 56px rgba(0,0,0,.38),
+    0 0 0 1px rgba(83,117,180,.07),
+    inset 0 1px rgba(255,255,255,.055);
+  backdrop-filter: blur(24px) saturate(135%);
+  -webkit-backdrop-filter: blur(24px) saturate(135%);
+  pointer-events: auto;
+  transition:
+    min-height .24s ease,
+    transform .24s ease,
+    box-shadow .24s ease,
+    background .24s ease,
+    padding .24s ease;
+}
+
+.career-dock-shell::before {
+  content: "";
+  position: absolute;
+  inset: 7px 50% 7px auto;
+  width: 1px;
+  opacity: .12;
+  background: linear-gradient(180deg, transparent, #fff, transparent);
+  transform: translateX(-52px);
+}
+
+.career-dock-shell::after {
+  content: "";
+  position: absolute;
+  inset: 7px auto 7px 50%;
+  width: 1px;
+  opacity: .12;
+  background: linear-gradient(180deg, transparent, #fff, transparent);
+  transform: translateX(52px);
+}
+
+.career-dock-side {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  gap: 8px;
+  min-width: 0;
+}
+
+.career-dock-item {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 17px;
+  color: rgba(233, 241, 252, .80);
+  background: transparent;
+  transition:
+    color .18s ease,
+    background .18s ease,
+    border-color .18s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.career-dock-item svg,
+.career-dock-center svg {
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.85;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.career-dock-item:hover {
+  color: #fff;
+  transform: translateY(-2px);
+  background: rgba(255,255,255,.055);
+  border-color: rgba(255,255,255,.055);
+}
+
+.career-dock-item.is-active {
+  color: #7eeeff;
+  background: linear-gradient(180deg, rgba(66,103,186,.17), rgba(255,255,255,.045));
+  border-color: rgba(110,194,255,.16);
+  box-shadow: inset 0 1px rgba(255,255,255,.045), 0 7px 20px rgba(0,0,0,.13);
+}
+
+.career-dock-item.is-active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 15px;
+  height: 2px;
+  border-radius: 999px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg,#22d3ee,#818cf8);
+  box-shadow: 0 0 10px rgba(34,211,238,.45);
+}
+
+.career-dock-item::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translate(-50%, 5px);
+  padding: 7px 9px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  color: #eaf3ff;
+  background: rgba(5,10,22,.92);
+  box-shadow: 0 10px 28px rgba(0,0,0,.24);
+  font-size: .65rem;
+  font-weight: 720;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+}
+
+.career-dock-item:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+.career-dock-center {
+  position: relative;
+  z-index: 4;
+  width: 92px;
+  height: 92px;
+  margin: -15px auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 28px;
+  color: white;
+  background:
+    radial-gradient(circle at 50% 22%, rgba(96,165,250,.13), transparent 35%),
+    linear-gradient(180deg, #192033 0%, #101729 100%);
+  box-shadow:
+    0 18px 44px rgba(0,0,0,.40),
+    0 0 0 1px rgba(92,124,198,.08),
+    inset 0 1px rgba(255,255,255,.08);
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    width .24s ease,
+    height .24s ease,
+    border-radius .24s ease,
+    margin .24s ease;
+}
+
+.career-dock-center:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 22px 54px rgba(0,0,0,.46),
+    0 0 26px rgba(79,70,229,.16),
+    inset 0 1px rgba(255,255,255,.09);
+}
+
+.career-dock-center strong {
+  position: relative;
+  z-index: 2;
+  font-size: .76rem;
+  line-height: 1;
+  letter-spacing: -.01em;
+}
+
+.career-dock-center svg {
+  position: relative;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+}
+
+.career-dock-accent {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg,#ff6b86,#f77965 48%,#ff9f62 100%);
+  box-shadow: 0 0 22px rgba(255,107,134,.20);
+}
+.career-dock-accent-top { top: 9px; }
+.career-dock-accent-bottom { bottom: 9px; }
+
+/* Scrolling tightens the dock only a little. Nothing disappears. */
+.career-dock.is-compact .career-dock-shell {
+  min-height: 62px;
+  padding-block: 6px;
+  transform: scale(.975);
+  background: rgba(5,10,22,.965);
+  box-shadow: 0 18px 50px rgba(0,0,0,.42), inset 0 1px rgba(255,255,255,.05);
+}
+
+.career-dock.is-compact .career-dock-center {
+  width: 84px;
+  height: 84px;
+  margin: -12px auto;
+  border-radius: 25px;
+}
+
+.career-dock.is-compact .career-dock-item {
+  width: 44px;
+  height: 44px;
+}
+
+@media (max-width: 680px) {
+  .career-dock {
+    bottom: max(12px, env(safe-area-inset-bottom));
+    width: calc(100% - 18px);
+  }
+
+  .career-dock-shell {
+    min-height: 66px;
+    grid-template-columns: 1fr 88px 1fr;
+    gap: 5px;
+    padding: 6px 10px;
+  }
+
+  .career-dock-shell::before { transform: translateX(-44px); }
+  .career-dock-shell::after { transform: translateX(44px); }
+  .career-dock-side { gap: 2px; }
+  .career-dock-item { width: 42px; height: 42px; border-radius: 14px; }
+  .career-dock-item svg { width: 21px; height: 21px; }
+
+  .career-dock-center {
+    width: 82px;
+    height: 82px;
+    margin: -12px auto;
+    border-radius: 24px;
+    gap: 5px;
+  }
+
+  .career-dock-center strong { font-size: .68rem; }
+  .career-dock-center svg { width: 21px; height: 21px; }
+  .career-dock-accent { left: 12px; right: 12px; height: 10px; }
+  .career-dock-accent-top { top: 8px; }
+  .career-dock-accent-bottom { bottom: 8px; }
+
+  .career-dock.is-compact .career-dock-center {
+    width: 78px;
+    height: 78px;
+    border-radius: 23px;
+  }
+
+  .career-dock-item::before { display: none; }
+}
+
+@media (max-width: 420px) {
+  .career-dock-shell {
+    grid-template-columns: 1fr 78px 1fr;
+    padding-inline: 7px;
+  }
+
+  .career-dock-shell::before,
+  .career-dock-shell::after { display: none; }
+  .career-dock-item { width: 38px; height: 38px; }
+  .career-dock-item svg { width: 19px; height: 19px; }
+  .career-dock-center { width: 76px; height: 76px; border-radius: 22px; }
+  .career-dock-center strong { font-size: .64rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .career-dock-shell,
+  .career-dock-item,
+  .career-dock-center {
+    transition: none !important;
+  }
+}
